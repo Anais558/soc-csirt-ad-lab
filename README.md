@@ -16,7 +16,7 @@ complet : attaque → détection → investigation → réponse à incident.
 
 ## Progression
 - [x] Réseau isolé configuré
-- [ ] DC Windows Server monté
+- [x] DC Windows Server monté
 - [ ] Kali configuré
 - [ ] Wazuh installé
 - [ ] Sysmon déployé
