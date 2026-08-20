@@ -21,7 +21,6 @@ Configuration retenue :
 
 **Solution appliquée :** recréation de la VM avec l'option **"I will install the operating system later"**, puis montage manuel de l'ISO dans les paramètres CD/DVD. L'installation s'est ensuite déroulée normalement en mode manuel (sélection d'édition, licence, partitionnement).
 
-
 ## 2. Installation de l'OS
 
 - Édition choisie : **Windows Server 2022 Standard Evaluation (Desktop Experience)** — interface graphique conservée pour faciliter la manipulation d'AD
@@ -32,10 +31,12 @@ Configuration retenue :
 Un contrôleur de domaine nécessite une IP fixe (DNS et AD en dépendent).
 
 Paramètres appliqués sur la carte Ethernet0 :
-- **Adresse IP :** 192.168.50.10
+- **Adresse IP :** 192.168.117.10
 - **Masque de sous-réseau :** 255.255.255.0
 - **Passerelle :** aucune (réseau isolé)
 - **DNS préféré :** 127.0.0.1 (le DC sera son propre serveur DNS)
+
+> **Note :** l'IP a initialement été fixée à `192.168.50.10`, un choix arbitraire fait sans vérifier le sous-réseau réel attribué par VMware au réseau Host-only. Une fois Kali connecté (voir `02-setup-kali.md`), il est apparu que VMware utilisait en réalité le sous-réseau `192.168.117.0/24` pour ce VMnet. L'IP du DC a donc été corrigée en conséquence pour que les deux machines puissent communiquer.
 
 ![Configuration IP statique](../screenshots/dc/02-network-config.png)
 
