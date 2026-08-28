@@ -18,9 +18,10 @@ complet : attaque → détection → investigation → réponse à incident.
 - [x] Réseau isolé configuré
 - [x] DC Windows Server monté
 - [x] Kali configuré
+- [x] Premier incident (Kerberoasting) documenté
 - [ ] Wazuh installé
 - [ ] Sysmon déployé
-- [ ] Premier incident détecté et documenté
+- [ ] Détection de l'incident dans Wazuh
 
 ## Documentation détaillée
 Voir le dossier `docs/` pour le pas-à-pas complet de chaque brique.
