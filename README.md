@@ -19,7 +19,7 @@ complet : attaque → détection → investigation → réponse à incident.
 - [x] DC Windows Server monté
 - [x] Kali configuré
 - [x] Premier incident (Kerberoasting) documenté
-- [ ] Wazuh installé
+- [x] Wazuh installé
 - [ ] Sysmon déployé
 - [ ] Détection de l'incident dans Wazuh
 
