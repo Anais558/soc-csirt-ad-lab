@@ -72,6 +72,51 @@ Cette démonstration met en évidence deux points distincts :
 - Mettre en place une rotation régulière des mots de passe de comptes de service
 - Détecter les demandes anormales de TGS avec chiffrement RC4 (type 23), souvent signe d'une tentative de Kerberoasting (les services modernes utilisent AES) — voir `05-attacks-and-detection.md` pour la détection via Wazuh
 
-## Détection (à compléter une fois Wazuh en place)
+## Détection
 
-Voir `docs/05-attacks-and-detection.md` pour l'analyse des logs Windows correspondant à cette attaque (Event ID 4769 avec type de chiffrement RC4) et la règle de détection Wazuh associée.
+### Preuve côté Windows
+
+Confirmé dans l'Observateur d'événements (Journaux Windows → Sécurité) :
+251 événements Event ID 4769 filtrés sur la période du test, dont celui
+correspondant précisément à l'horodatage de l'attaque.
+
+### Preuve côté Wazuh (logs serveur, `archives.log`)
+
+Retrouvé dans `/var/ossec/logs/archives/archives.log` sur le manager Wazuh :
+
+```json
+{
+  "serviceName": "svc_sql",
+  "targetUserName": "jdupont@LABO.LOCAL",
+  "ticketEncryptionType": "0x17",
+  "ticketOptions": "0x40810010"
+}
+```
+
+Le champ déterminant est `ticketEncryptionType: 0x17` (RC4) — c'est la
+signature technique du Kerberoasting. Un ticket demandé légitimement par
+un service moderne utilise `0x12` (AES256), comme vérifié par comparaison
+avec un événement 4769 normal du compte administrateur sur la même période.
+
+### Problème d'affichage rencontré (dashboard Wazuh)
+
+L'événement est confirmé au niveau du manager (logs bruts `archives.log`)
+mais n'apparaît pas dans les résultats de recherche du dashboard web.
+Investigation menée :
+
+- Filebeat fonctionne et se connecte correctement à l'indexer (`filebeat
+  test output` → OK)
+- Après un redémarrage des VMs, les logs de Filebeat montrent plusieurs
+  échecs de reconnexion à l'indexer (`503 Service Unavailable: OpenSearch
+  Security not initialized`) avant stabilisation — cause probable d'une
+  fenêtre de perte d'événements pendant le redémarrage
+- Confirmation par requête directe sur l'API de l'indexer
+  (`curl .../_search?q=data.win.eventdata.serviceName:svc_sql`) : 0
+  résultat, malgré la présence confirmée de la donnée en amont (manager)
+- Débogage en cours — cause exacte non encore identifiée avec certitude
+
+**Point retenu pour le retour d'expérience** : cet épisode illustre bien
+la chaîne complète agent → manager → indexer → dashboard d'un SIEM, et le
+fait qu'une donnée "détectée" par le manager n'est pas automatiquement
+visible en interface si un maillon intermédiaire a un problème de
+synchronisation — un point de vigilance réel en environnement SOC.
